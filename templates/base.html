@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Campus Event Management & Feedback Analyzer — Manage university events, registrations, and analyze feedback.">
+    <title>{% block title %}Campus Event Manager{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="navbar__brand">
+                <span class="navbar__brand-icon">🎓</span>
+                EventHub
+            </a>
+            <ul class="navbar__links">
+                <li><a href="{{ url_for('index') }}"
+                        class="navbar__link {% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="{{ url_for('events_list') }}"
+                        class="navbar__link {% if request.endpoint in ['events_list', 'create_event', 'event_detail'] %}active{% endif %}">Events</a>
+                </li>
+                <li><a href="{{ url_for('students_list') }}"
+                        class="navbar__link {% if request.endpoint in ['students_list', 'add_student'] %}active{% endif %}">Students</a>
+                </li>
+                <li><a href="{{ url_for('register') }}"
+                        class="navbar__link {% if request.endpoint == 'register' %}active{% endif %}">Register</a></li>
+                <li><a href="{{ url_for('feedback') }}"
+                        class="navbar__link {% if request.endpoint == 'feedback' %}active{% endif %}">Feedback</a></li>
+                <li><a href="{{ url_for('analytics') }}"
+                        class="navbar__link {% if request.endpoint == 'analytics' %}active{% endif %}">Analytics</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash--{{ category }}">
+            {% if category == 'success' %}✅{% else %}⚠️{% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Campus Event Management &amp; Feedback Analyzer &mdash; Built with Python &amp; Flask</p>
+        </div>
+    </footer>
+</body>
+
+</html>

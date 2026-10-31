@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Submit Feedback — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Event Feedback</h1>
+        <p class="page-header__subtitle">Rate and review events you have attended</p>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('feedback') }}" class="form">
+            <div class="form__group">
+                <label for="event_id" class="form__label">Select Event</label>
+                <select id="event_id" name="event_id" class="form__select" required>
+                    <option value="">— Choose an event —</option>
+                    {% for event in events %}
+                        <option value="{{ event.event_id }}">{{ event.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form__group">
+                <label for="student_id" class="form__label">Select Student</label>
+                <select id="student_id" name="student_id" class="form__select" required>
+                    <option value="">— Choose your name —</option>
+                    {% for student in students %}
+                        <option value="{{ student.student_id }}">
+                            {{ student.name }} ({{ student.student_id }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <p class="form__hint">You must be registered for the event to submit feedback.</p>
+            </div>
+
+            <div class="form__group">
+                <label class="form__label">Rating</label>
+                <div class="rating-group">
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="5 stars — Excellent">★</label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars — Great">★</label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars — Good">★</label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars — Fair">★</label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star — Poor">★</label>
+                </div>
+            </div>
+
+            <div class="form__group">
+                <label for="comment" class="form__label">Comment (Optional)</label>
+                <textarea id="comment" name="comment" class="form__textarea"
+                          placeholder="Share your experience..." maxlength="500"></textarea>
+                <p class="form__hint">Maximum 500 characters</p>
+            </div>
+
+            <div class="form__group">
+                <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">
+                    Submit Feedback
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Create Event — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Create Event</h1>
+        <p class="page-header__subtitle">Set up a new campus event for students</p>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('create_event') }}" class="form">
+            <div class="form__group">
+                <label for="event_id" class="form__label">Event ID</label>
+                <input type="text" id="event_id" name="event_id" class="form__input"
+                       placeholder="e.g., EVT-001" required maxlength="20"
+                       pattern="[A-Za-z0-9_-]+"
+                       title="Alphanumeric characters, hyphens, and underscores only">
+                <p class="form__hint">Unique identifier (alphanumeric, hyphens, underscores)</p>
+            </div>
+
+            <div class="form__group">
+                <label for="name" class="form__label">Event Name</label>
+                <input type="text" id="name" name="name" class="form__input"
+                       placeholder="e.g., Annual Tech Fest 2026" required maxlength="100">
+            </div>
+
+            <div class="form__group">
+                <label for="date" class="form__label">Date</label>
+                <input type="date" id="date" name="date" class="form__input" required
+                       min="{{ today_date }}">
+            </div>
+
+            <div class="form__group">
+                <label for="venue" class="form__label">Venue</label>
+                <input type="text" id="venue" name="venue" class="form__input"
+                       placeholder="e.g., Main Auditorium" required maxlength="100">
+            </div>
+
+            <div class="form__group">
+                <label for="max_participants" class="form__label">Maximum Participants</label>
+                <input type="number" id="max_participants" name="max_participants"
+                       class="form__input" placeholder="e.g., 100" required min="1" max="10000">
+            </div>
+
+            <div class="form__group" style="display: flex; gap: var(--space-md);">
+                <button type="submit" class="btn btn--primary btn--lg" style="flex: 1;">Create Event</button>
+                <a href="{{ url_for('events_list') }}" class="btn btn--outline btn--lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

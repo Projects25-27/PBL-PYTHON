@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Add Student — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Add Student</h1>
+        <p class="page-header__subtitle">Register a new student in the system</p>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('add_student') }}" class="form">
+            <div class="form__group">
+                <label for="student_id" class="form__label">Student ID</label>
+                <input type="text" id="student_id" name="student_id" class="form__input"
+                       placeholder="e.g., STU-001" required maxlength="20"
+                       pattern="[A-Za-z0-9_-]+"
+                       title="Alphanumeric characters, hyphens, and underscores only">
+                <p class="form__hint">Unique student identifier</p>
+            </div>
+
+            <div class="form__group">
+                <label for="name" class="form__label">Full Name</label>
+                <input type="text" id="name" name="name" class="form__input"
+                       placeholder="e.g., Rahul Sharma" required maxlength="100">
+            </div>
+
+            <div class="form__group">
+                <label for="email" class="form__label">Email Address</label>
+                <input type="email" id="email" name="email" class="form__input"
+                       placeholder="e.g., rahul@university.edu" required maxlength="100">
+            </div>
+
+            <div class="form__group">
+                <label for="department" class="form__label">Department</label>
+                <input type="text" id="department" name="department" class="form__input"
+                       placeholder="e.g., Computer Science" required maxlength="100">
+            </div>
+
+            <div class="form__group" style="display: flex; gap: var(--space-md);">
+                <button type="submit" class="btn btn--primary btn--lg" style="flex: 1;">Add Student</button>
+                <a href="{{ url_for('students_list') }}" class="btn btn--outline btn--lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

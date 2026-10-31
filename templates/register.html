@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Event Registration — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Event Registration</h1>
+        <p class="page-header__subtitle">Register a student for a campus event</p>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ url_for('register') }}" class="form">
+            <div class="form__group">
+                <label for="event_id" class="form__label">Select Event</label>
+                <select id="event_id" name="event_id" class="form__select" required>
+                    <option value="">— Choose an event —</option>
+                    {% for event in events %}
+                        <option value="{{ event.event_id }}"
+                            {% if event.is_full() %}disabled{% endif %}>
+                            {{ event.name }}
+                            ({{ event.registered_count() }}/{{ event.max_participants }})
+                            {% if event.is_full() %} — FULL{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if not events %}
+                    <p class="form__hint">No events available. <a href="{{ url_for('create_event') }}">Create one</a> first.</p>
+                {% endif %}
+            </div>
+
+            <div class="form__group">
+                <label for="student_id" class="form__label">Select Student</label>
+                <select id="student_id" name="student_id" class="form__select" required>
+                    <option value="">— Choose a student —</option>
+                    {% for student in students %}
+                        <option value="{{ student.student_id }}">
+                            {{ student.name }} ({{ student.student_id }})
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if not students %}
+                    <p class="form__hint">No students available. <a href="{{ url_for('add_student') }}">Add one</a> first.</p>
+                {% endif %}
+            </div>
+
+            <div class="form__group">
+                <button type="submit" class="btn btn--secondary btn--lg" style="width: 100%;">
+                    Register for Event
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="glass-panel" style="max-width: 650px; margin: 0 auto;">
+        <h3 style="color: var(--clr-text-heading); margin-bottom: var(--space-md);">ℹ️ Registration Rules</h3>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); color: var(--clr-text-muted);">
+            <li>✅ Each student can register for an event only once</li>
+            <li>✅ Registration is blocked when the event reaches maximum capacity</li>
+            <li>✅ Both student and event must exist in the system</li>
+            <li>✅ Registrations can be cancelled from the event detail page</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+feedback_id,event_id,student_id,rating,comment,submitted_at
+FB001,EVT-101,STU-001,5,Exceptional keynote speakers and very insightful hands-on sessions!,2026-09-22 18:00
+FB002,EVT-101,STU-002,4,Great event overall. Audio system could be improved.,2026-09-22 19:15
+FB003,EVT-101,STU-005,5,Learned so much about current LLM and ML deployment trends.,2026-09-23 09:00
+FB004,EVT-102,STU-001,4,Intense 24 hours! Mentors were super supportive.,2026-09-24 11:30
+FB005,EVT-102,STU-003,5,Great problem statements and seamless organization.,2026-09-24 12:45
+FB006,EVT-103,STU-002,5,Unforgettable performances and vibrant atmosphere!,2026-09-26 10:20
+FB007,EVT-103,STU-004,4,Loved the stage lighting and student band.,2026-09-26 14:00
+FB008,EVT-104,STU-003,4,Hardware kits were high quality. Wanted more coding time.,2026-09-27 15:30
+FB009,EVT-105,STU-008,5,Connected with three prospective recruiters on the spot!,2026-09-27 17:10
+FB010,001,ok,5,vgbnm,2026-09-28 00:37
+FB011,048,048,3,,2026-10-10 11:25

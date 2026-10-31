@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero__title">Campus Event Management<br>&amp; Feedback Analyzer</h1>
+        <p class="hero__subtitle">
+            Manage university events, track student registrations, collect feedback,
+            and visualize analytics — all in one place.
+        </p>
+        <div class="hero__actions">
+            <a href="{{ url_for('create_event') }}" class="btn btn--primary btn--lg">Create Event</a>
+            <a href="{{ url_for('analytics') }}" class="btn btn--outline btn--lg">View Analytics</a>
+        </div>
+    </section>
+
+    <!-- Stats Overview -->
+    <section class="section">
+        <div class="grid grid--4">
+            <div class="stat-card animate-in">
+                <div class="stat-card__icon">📅</div>
+                <div class="stat-card__value">{{ analytics.total_events }}</div>
+                <div class="stat-card__label">Total Events</div>
+            </div>
+            <div class="stat-card animate-in">
+                <div class="stat-card__icon">👥</div>
+                <div class="stat-card__value">{{ analytics.total_students }}</div>
+                <div class="stat-card__label">Students</div>
+            </div>
+            <div class="stat-card animate-in">
+                <div class="stat-card__icon">📝</div>
+                <div class="stat-card__value">{{ analytics.total_registrations }}</div>
+                <div class="stat-card__label">Registrations</div>
+            </div>
+            <div class="stat-card animate-in">
+                <div class="stat-card__icon">⭐</div>
+                <div class="stat-card__value">{{ analytics.overall_avg_rating }}</div>
+                <div class="stat-card__label">Avg. Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Links -->
+    <section class="section">
+        <h2 class="section__title">⚡ Quick Actions</h2>
+        <div class="quick-links">
+            <a href="{{ url_for('create_event') }}" class="quick-link animate-in">
+                <div class="quick-link__icon">🎪</div>
+                <div class="quick-link__title">Create Event</div>
+                <div class="quick-link__desc">Set up a new campus event</div>
+            </a>
+            <a href="{{ url_for('add_student') }}" class="quick-link animate-in">
+                <div class="quick-link__icon">🧑‍🎓</div>
+                <div class="quick-link__title">Add Student</div>
+                <div class="quick-link__desc">Register a new student</div>
+            </a>
+            <a href="{{ url_for('register') }}" class="quick-link animate-in">
+                <div class="quick-link__icon">✍️</div>
+                <div class="quick-link__title">Event Registration</div>
+                <div class="quick-link__desc">Sign up for events</div>
+            </a>
+            <a href="{{ url_for('feedback') }}" class="quick-link animate-in">
+                <div class="quick-link__icon">💬</div>
+                <div class="quick-link__title">Submit Feedback</div>
+                <div class="quick-link__desc">Rate and review events</div>
+            </a>
+            <a href="{{ url_for('analytics') }}" class="quick-link animate-in">
+                <div class="quick-link__icon">📊</div>
+                <div class="quick-link__title">Analytics</div>
+                <div class="quick-link__desc">Charts and insights</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Recent Events Table -->
+    {% if analytics.event_stats %}
+    <section class="section">
+        <h2 class="section__title">📋 Event Overview</h2>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>Capacity</th>
+                        <th>Feedback</th>
+                        <th>Avg Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in analytics.event_stats %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('event_detail', event_id=ev.event_id) }}">
+                                <strong>{{ ev.name }}</strong>
+                            </a>
+                        </td>
+                        <td>{{ ev.date }}</td>
+                        <td>{{ ev.venue }}</td>
+                        <td>
+                            {{ ev.registered }} / {{ ev.max_participants }}
+                            <div class="capacity-bar">
+                                {% set pct = (ev.registered / ev.max_participants * 100) if ev.max_participants > 0 else
+                                0 %}
+                                <div class="capacity-bar__fill {% if pct >= 100 %}capacity-bar__fill--full{% elif pct >= 75 %}capacity-bar__fill--warning{% endif %}"
+                                    style="width: {{ [pct, 100] | min }}%"></div>
+                            </div>
+                        </td>
+                        <td>{{ ev.feedback_count }}</td>
+                        <td>
+                            {% if ev.avg_rating != 'N/A' %}
+                            <span class="badge badge--success">{{ ev.avg_rating }} ⭐</span>
+                            {% else %}
+                            <span class="badge badge--info">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

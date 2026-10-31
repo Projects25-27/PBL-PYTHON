@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ event.name }} — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">{{ event.name }}</h1>
+        <p class="page-header__subtitle">Event Details &amp; Registered Students</p>
+    </div>
+
+    <!-- Event Info Cards -->
+    <div class="detail-info">
+        <div class="detail-info__item">
+            <div class="detail-info__label">Event ID</div>
+            <div class="detail-info__value">{{ event.event_id }}</div>
+        </div>
+        <div class="detail-info__item">
+            <div class="detail-info__label">Date</div>
+            <div class="detail-info__value">{{ event.date }}</div>
+        </div>
+        <div class="detail-info__item">
+            <div class="detail-info__label">Venue</div>
+            <div class="detail-info__value">{{ event.venue }}</div>
+        </div>
+        <div class="detail-info__item">
+            <div class="detail-info__label">Capacity</div>
+            <div class="detail-info__value">
+                {{ event.registered_count() }} / {{ event.max_participants }}
+                {% set pct = (event.registered_count() / event.max_participants * 100) if event.max_participants > 0
+                else 0 %}
+                <div class="capacity-bar" style="margin-top: 8px;">
+                    <div class="capacity-bar__fill {% if pct >= 100 %}capacity-bar__fill--full{% elif pct >= 75 %}capacity-bar__fill--warning{% endif %}"
+                        style="width: {{ [pct, 100] | min }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="detail-info__item">
+            <div class="detail-info__label">Status</div>
+            <div class="detail-info__value">
+                {% if event.is_full() %}
+                <span class="badge badge--danger">Full</span>
+                {% else %}
+                <span class="badge badge--success">Open</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar">
+        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+            <a href="{{ url_for('register') }}" class="btn btn--primary">Register Student</a>
+            <a href="{{ url_for('feedback') }}" class="btn btn--secondary">Submit Feedback</a>
+        </div>
+        <form method="POST" action="{{ url_for('delete_event', event_id=event.event_id) }}" style="display: inline;">
+            <button type="submit" class="btn btn--danger btn--sm" title="Delete this event">🗑 Delete Event</button>
+        </form>
+    </div>
+
+    <!-- Registered Students -->
+    <section class="section">
+        <h2 class="section__title">👥 Registered Students ({{ students | length }})</h2>
+
+        {% if students %}
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Registered On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in students %}
+                    <tr>
+                        <td><span class="badge badge--info">{{ item.student.student_id }}</span></td>
+                        <td><strong>{{ item.student.name }}</strong></td>
+                        <td>{{ item.student.email }}</td>
+                        <td>{{ item.student.department }}</td>
+                        <td>{{ item.reg.reg_date }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('cancel_registration') }}">
+                                <input type="hidden" name="event_id" value="{{ event.event_id }}">
+                                <input type="hidden" name="student_id" value="{{ item.student.student_id }}">
+                                <button type="submit" class="btn btn--danger btn--sm">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state__icon">🪑</div>
+            <h3 class="empty-state__title">No students registered yet</h3>
+            <p class="empty-state__text">Be the first to register for this event!</p>
+            <a href="{{ url_for('register') }}" class="btn btn--primary">Register Now</a>
+        </div>
+        {% endif %}
+    </section>
+
+    <div class="text-center mt-lg">
+        <a href="{{ url_for('events_list') }}" class="btn btn--outline">← Back to Events</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Students — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Students</h1>
+        <p class="page-header__subtitle">Browse, search, and manage students</p>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{{ url_for('students_list') }}" class="search-bar">
+        <input type="text" name="q" class="form__input" placeholder="Search by name, ID, or department..."
+            value="{{ query }}">
+        <button type="submit" class="btn btn--primary">Search</button>
+        {% if query %}
+        <a href="{{ url_for('students_list') }}" class="btn btn--outline">Clear</a>
+        {% endif %}
+    </form>
+
+    <div class="action-bar">
+        <p class="text-muted">
+            {% if query %}
+            Found {{ students | length }} result{{ 's' if students | length != 1 }} for "{{ query }}"
+            {% else %}
+            {{ students | length }} student{{ 's' if students | length != 1 }} registered
+            {% endif %}
+        </p>
+        <a href="{{ url_for('add_student') }}" class="btn btn--primary">+ Add Student</a>
+    </div>
+
+    {% if students %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><span class="badge badge--info">{{ student.student_id }}</span></td>
+                    <td><strong>{{ student.name }}</strong></td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.department }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state__icon">👥</div>
+        <h3 class="empty-state__title">
+            {% if query %}No students found{% else %}No students yet{% endif %}
+        </h3>
+        <p class="empty-state__text">
+            {% if query %}
+            Try a different search term.
+            {% else %}
+            Add your first student to get started.
+            {% endif %}
+        </p>
+        <a href="{{ url_for('add_student') }}" class="btn btn--primary">Add Student</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

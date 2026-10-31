@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Events — Campus Event Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-header__title">Events</h1>
+        <p class="page-header__subtitle">Browse and manage all campus events</p>
+    </div>
+
+    <div class="action-bar">
+        <p class="text-muted">{{ events | length }} event{{ 's' if events | length != 1 }} found</p>
+        <a href="{{ url_for('create_event') }}" class="btn btn--primary">+ Create Event</a>
+    </div>
+
+    {% if events %}
+        <div class="grid grid--3">
+            {% for event in events %}
+            <div class="card event-card animate-in">
+                <div>
+                    <h3 class="card__title">{{ event.name }}</h3>
+                    <div class="card__meta">
+                        📅 {{ event.date }}<br>
+                        📍 {{ event.venue }}
+                    </div>
+                    <div>
+                        {% set count = event.registered_count() %}
+                        {% set pct = (count / event.max_participants * 100) if event.max_participants > 0 else 0 %}
+                        <span class="text-muted" style="font-size: var(--fs-sm);">
+                            {{ count }} / {{ event.max_participants }} registered
+                        </span>
+                        <div class="capacity-bar">
+                            <div class="capacity-bar__fill {% if pct >= 100 %}capacity-bar__fill--full{% elif pct >= 75 %}capacity-bar__fill--warning{% endif %}"
+                                 style="width: {{ [pct, 100] | min }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="event-card__footer">
+                    <a href="{{ url_for('event_detail', event_id=event.event_id) }}" class="btn btn--outline btn--sm">View Details</a>
+                    {% if event.is_full() %}
+                        <span class="badge badge--danger">Full</span>
+                    {% else %}
+                        <span class="badge badge--success">Open</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state__icon">📅</div>
+            <h3 class="empty-state__title">No events yet</h3>
+            <p class="empty-state__text">Create your first campus event to get started.</p>
+            <a href="{{ url_for('create_event') }}" class="btn btn--primary">Create Event</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
