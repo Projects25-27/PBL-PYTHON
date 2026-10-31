@@ -1,7 +1,7 @@
 import unittest
 from app import (
     app, Event, Student, Registration,
-    DuplicateRegistrationError, EventFullError, InvalidEventIDError, InvalidStudentIDError,
+    DuplicateRegistrationError, EventFullError, EventClosedError, InvalidEventIDError, InvalidStudentIDError,
     generate_charts, get_analytics
 )
 
@@ -91,6 +91,42 @@ class CampusEventAppTestCase(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(b'already registered', resp.data)
+
+    def test_past_event_status_and_prevention(self):
+        # EVT-101 is on 2026-10-15 (past)
+        evt_past = Event.find('EVT-101')
+        self.assertTrue(evt_past.is_past())
+        self.assertEqual(evt_past.status, 'Closed')
+
+        # EVT-105 is on 2026-11-20 (future)
+        evt_future = Event.find('EVT-105')
+        self.assertFalse(evt_future.is_past())
+
+        # Attempt to register STU-004 (not yet registered) for past event EVT-101
+        self.assertFalse(Registration.is_duplicate('EVT-101', 'STU-004'))
+        resp = self.client.post('/register', data={
+            'event_id': 'EVT-101',
+            'student_id': 'STU-004'
+        }, follow_redirects=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b'Registration is closed', resp.data)
+
+    def test_event_list_filters(self):
+        # All events
+        resp = self.client.get('/events?filter=all')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b'AI &amp; Machine Learning Symposium', resp.data)
+        self.assertIn(b'Closed', resp.data)
+
+        # Upcoming filter should not include EVT-101
+        resp = self.client.get('/events?filter=upcoming')
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn(b'AI &amp; Machine Learning Symposium', resp.data)
+
+        # Past filter should include EVT-101
+        resp = self.client.get('/events?filter=past')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b'AI &amp; Machine Learning Symposium', resp.data)
 
     def test_security_headers(self):
         resp = self.client.get('/')

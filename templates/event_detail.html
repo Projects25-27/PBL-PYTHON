@@ -8,21 +8,34 @@
         <p class="page-header__subtitle">Event Details &amp; Registered Students</p>
     </div>
 
+    {% if event.is_past() %}
+    <!-- Event Concluded Notice Banner -->
+    <div class="event-closed-banner" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: rgba(30, 30, 54, 0.75); border: 1px solid rgba(160, 160, 192, 0.25); border-left: 4px solid var(--clr-text-muted); border-radius: var(--radius-lg); margin-top: 1.5rem; margin-bottom: 2.25rem;">
+        <span style="font-size: 1.75rem; line-height: 1; flex-shrink: 0;">📅</span>
+        <div>
+            <div style="font-weight: 700; color: var(--clr-text-heading); font-size: var(--fs-base); margin-bottom: 0.25rem;">Event Concluded</div>
+            <p style="margin: 0; color: var(--clr-text-muted); font-size: var(--fs-sm); line-height: 1.5;">
+                This event concluded on <strong>{{ event.date }}</strong>. New registrations are closed, but feedback collection remains open.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Event Info Cards -->
-    <div class="detail-info">
-        <div class="detail-info__item">
+    <div class="detail-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="detail-info__item" style="background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 1.25rem;">
             <div class="detail-info__label">Event ID</div>
             <div class="detail-info__value">{{ event.event_id }}</div>
         </div>
-        <div class="detail-info__item">
+        <div class="detail-info__item" style="background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 1.25rem;">
             <div class="detail-info__label">Date</div>
             <div class="detail-info__value">{{ event.date }}</div>
         </div>
-        <div class="detail-info__item">
+        <div class="detail-info__item" style="background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 1.25rem;">
             <div class="detail-info__label">Venue</div>
             <div class="detail-info__value">{{ event.venue }}</div>
         </div>
-        <div class="detail-info__item">
+        <div class="detail-info__item" style="background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 1.25rem;">
             <div class="detail-info__label">Capacity</div>
             <div class="detail-info__value">
                 {{ event.registered_count() }} / {{ event.max_participants }}
@@ -34,10 +47,12 @@
                 </div>
             </div>
         </div>
-        <div class="detail-info__item">
+        <div class="detail-info__item" style="background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 1.25rem;">
             <div class="detail-info__label">Status</div>
             <div class="detail-info__value">
-                {% if event.is_full() %}
+                {% if event.is_past() %}
+                <span class="badge badge--closed">Closed</span>
+                {% elif event.is_full() %}
                 <span class="badge badge--danger">Full</span>
                 {% else %}
                 <span class="badge badge--success">Open</span>
@@ -48,8 +63,16 @@
 
     <!-- Actions -->
     <div class="action-bar">
-        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
-            <a href="{{ url_for('register') }}" class="btn btn--primary">Register Student</a>
+        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap; align-items: center;">
+            {% if not event.is_past() %}
+                {% if not event.is_full() %}
+                    <a href="{{ url_for('register') }}" class="btn btn--primary">Register Student</a>
+                {% else %}
+                    <button class="btn btn--outline" disabled title="Event is full">Event Full</button>
+                {% endif %}
+            {% else %}
+                <span class="badge badge--closed" style="padding: 0.5rem 0.85rem; font-size: var(--fs-sm);">Registration Closed</span>
+            {% endif %}
             <a href="{{ url_for('feedback') }}" class="btn btn--secondary">Submit Feedback</a>
         </div>
         <form method="POST" action="{{ url_for('delete_event', event_id=event.event_id) }}" style="display: inline;">

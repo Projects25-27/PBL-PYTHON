@@ -521,7 +521,7 @@ img {
 /* --- Grid Layouts --- */
 .grid {
     display: grid;
-    gap: var(--space-lg);
+    gap: var(--space-xl);
 }
 
 .grid--2 {
@@ -529,7 +529,7 @@ img {
 }
 
 .grid--3 {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 .grid--4 {
@@ -665,6 +665,66 @@ img {
 .badge--info {
     background: rgba(108, 92, 231, 0.15);
     color: var(--clr-primary-light);
+}
+
+.badge--closed,
+.badge--secondary,
+.badge--muted {
+    background: rgba(160, 160, 192, 0.15);
+    color: var(--clr-text-muted);
+    border: 1px solid rgba(160, 160, 192, 0.25);
+}
+
+.event-card--past {
+    opacity: 0.9;
+    border-color: rgba(160, 160, 192, 0.2);
+}
+
+/* --- Events Toolbar (Tabs + Action) --- */
+.events-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--clr-border);
+}
+
+.events-toolbar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-tabs .btn {
+    min-width: 130px;
+    text-align: center;
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--fs-sm);
+}
+
+/* --- Event Closed Notice Banner --- */
+.event-closed-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(30, 30, 54, 0.75);
+    border: 1px solid rgba(160, 160, 192, 0.25);
+    border-left: 4px solid var(--clr-text-muted);
+    border-radius: var(--radius-lg);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
 }
 
 /* --- Empty State --- */
@@ -856,10 +916,11 @@ img {
 .capacity-bar {
     width: 100%;
     height: 8px;
-    background: var(--clr-surface);
+    background: rgba(42, 42, 74, 0.8);
     border-radius: var(--radius-full);
     overflow: hidden;
     margin-top: var(--space-sm);
+    border: 1px solid var(--clr-border);
 }
 
 .capacity-bar__fill {
@@ -867,6 +928,7 @@ img {
     border-radius: var(--radius-full);
     transition: width var(--transition-slow);
     background: var(--grad-secondary);
+    min-width: 0;
 }
 
 .capacity-bar__fill--warning {
@@ -882,13 +944,14 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    min-height: 220px;
 }
 
 .event-card__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: var(--space-lg);
+    margin-top: auto;
     padding-top: var(--space-md);
     border-top: 1px solid var(--clr-border);
 }
@@ -905,15 +968,17 @@ img {
 
 .detail-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
     margin-bottom: var(--space-xl);
 }
 
 .detail-info__item {
     background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
     border-radius: var(--radius-md);
-    padding: var(--space-md);
+    padding: var(--space-lg);
+    min-height: 80px;
 }
 
 .detail-info__label {
@@ -949,7 +1014,8 @@ img {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(108, 92, 231, 0.1);
     border-radius: var(--radius-xl);
-    padding: var(--space-2xl);
+    padding: var(--space-xl) var(--space-2xl);
+    margin-bottom: var(--space-xl);
 }
 
 /* ==========================================================================
@@ -1024,6 +1090,20 @@ img {
 
     .detail-header {
         flex-direction: column;
+    }
+
+    .detail-info {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: var(--space-md);
+    }
+
+    .filter-tabs {
+        width: 100%;
+    }
+
+    .filter-tabs .btn {
+        flex: 1;
+        min-width: 0;
     }
 }
 

@@ -69,6 +69,7 @@
                         <th>Event Name</th>
                         <th>Date</th>
                         <th>Venue</th>
+                        <th>Status</th>
                         <th>Registered</th>
                         <th>Capacity</th>
                         <th>Feedback Count</th>
@@ -82,6 +83,15 @@
                         <td><strong>{{ ev.name }}</strong></td>
                         <td>{{ ev.date }}</td>
                         <td>{{ ev.venue }}</td>
+                        <td>
+                            {% if ev.is_past %}
+                            <span class="badge badge--closed">Closed</span>
+                            {% elif ev.is_full %}
+                            <span class="badge badge--danger">Full</span>
+                            {% else %}
+                            <span class="badge badge--success">Open</span>
+                            {% endif %}
+                        </td>
                         <td>{{ ev.registered }}</td>
                         <td>{{ ev.max_participants }}</td>
                         <td>{{ ev.feedback_count }}</td>

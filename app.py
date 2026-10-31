@@ -131,6 +131,23 @@ class Event:
     def is_full(self):
         return self.registered_count() >= self.max_participants
 
+    def is_past(self):
+        """Return True if the event date is in the past."""
+        try:
+            event_date = datetime.strptime(self.date, '%Y-%m-%d').date()
+            return event_date < datetime.today().date()
+        except (ValueError, TypeError):
+            return False
+
+    @property
+    def status(self):
+        """Return 'Closed' if past, 'Full' if full, else 'Open'."""
+        if self.is_past():
+            return 'Closed'
+        if self.is_full():
+            return 'Full'
+        return 'Open'
+
     @staticmethod
     def delete(event_id):
         """Delete an event by rewriting the CSV without it."""
@@ -272,6 +289,11 @@ class DuplicateRegistrationError(Exception):
 
 class EventFullError(Exception):
     """Raised when an event has reached its maximum participant limit."""
+    pass
+
+
+class EventClosedError(Exception):
+    """Raised when trying to register for an event that has closed or already ended."""
     pass
 
 
@@ -439,15 +461,32 @@ def get_analytics():
         else:
             avg_r = 'N/A'
 
+        is_past = False
+        try:
+            is_past = datetime.strptime(str(ev_row['date']).strip(), '%Y-%m-%d').date() < datetime.today().date()
+        except (ValueError, TypeError):
+            pass
+
+        try:
+            max_p = int(ev_row['max_participants'])
+        except (ValueError, TypeError):
+            max_p = 0
+
+        is_full = (reg_count >= max_p) if max_p > 0 else False
+        status = 'Closed' if is_past else ('Full' if is_full else 'Open')
+
         event_stats.append({
             'event_id': eid,
             'name': ev_row['name'],
             'date': ev_row['date'],
             'venue': ev_row['venue'],
-            'max_participants': ev_row['max_participants'],
+            'max_participants': max_p,
             'registered': reg_count,
             'feedback_count': fb_count,
-            'avg_rating': avg_r
+            'avg_rating': avg_r,
+            'is_past': is_past,
+            'is_full': is_full,
+            'status': status
         })
 
     return {
@@ -494,8 +533,27 @@ def index():
 # -- Events CRUD --
 @app.route('/events')
 def events_list():
-    events = Event.all()
-    return render_template('events.html', events=events)
+    filter_type = request.args.get('filter', 'all').strip().lower()
+    all_events = Event.all()
+    upcoming_events = [e for e in all_events if not e.is_past()]
+    past_events = [e for e in all_events if e.is_past()]
+
+    if filter_type == 'upcoming':
+        events = upcoming_events
+    elif filter_type == 'past':
+        events = past_events
+    else:
+        filter_type = 'all'
+        events = all_events
+
+    return render_template(
+        'events.html',
+        events=events,
+        current_filter=filter_type,
+        total_count=len(all_events),
+        upcoming_count=len(upcoming_events),
+        past_count=len(past_events)
+    )
 
 
 @app.route('/events/create', methods=['GET', 'POST'])
@@ -655,6 +713,12 @@ def register():
                     f"Student '{student.name}' is already registered for '{event.name}'."
                 )
 
+            # Check if event has already passed (closed)
+            if event.is_past():
+                raise EventClosedError(
+                    f"Event '{event.name}' took place on {event.date}. Registration is closed."
+                )
+
             # Check if event is full
             if event.is_full():
                 raise EventFullError(
@@ -667,7 +731,7 @@ def register():
             flash(f"'{student.name}' registered for '{event.name}' successfully!", 'success')
 
         except (InvalidEventIDError, InvalidStudentIDError,
-                DuplicateRegistrationError, EventFullError) as e:
+                DuplicateRegistrationError, EventClosedError, EventFullError) as e:
             flash(str(e), 'error')
 
         return redirect(url_for('register'))

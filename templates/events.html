@@ -8,15 +8,35 @@
         <p class="page-header__subtitle">Browse and manage all campus events</p>
     </div>
 
-    <div class="action-bar">
-        <p class="text-muted">{{ events | length }} event{{ 's' if events | length != 1 }} found</p>
-        <a href="{{ url_for('create_event') }}" class="btn btn--primary">+ Create Event</a>
+    <!-- Events Toolbar (Filters & Actions) -->
+    <div class="events-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; margin-top: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--clr-border);">
+        <div class="filter-tabs" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <a href="{{ url_for('events_list', filter='all') }}"
+               class="btn btn--sm {% if current_filter == 'all' %}btn--primary{% else %}btn--outline{% endif %}"
+               style="padding: 0.5rem 1.25rem; border-radius: 9999px;">
+                All Events ({{ total_count }})
+            </a>
+            <a href="{{ url_for('events_list', filter='upcoming') }}"
+               class="btn btn--sm {% if current_filter == 'upcoming' %}btn--primary{% else %}btn--outline{% endif %}"
+               style="padding: 0.5rem 1.25rem; border-radius: 9999px;">
+                Upcoming ({{ upcoming_count }})
+            </a>
+            <a href="{{ url_for('events_list', filter='past') }}"
+               class="btn btn--sm {% if current_filter == 'past' %}btn--primary{% else %}btn--outline{% endif %}"
+               style="padding: 0.5rem 1.25rem; border-radius: 9999px;">
+                Past / Closed ({{ past_count }})
+            </a>
+        </div>
+        <div class="events-toolbar__actions" style="display: flex; align-items: center; gap: 1.25rem;">
+            <span class="text-muted" style="font-size: var(--fs-sm);">{{ events | length }} event{{ 's' if events | length != 1 }} found</span>
+            <a href="{{ url_for('create_event') }}" class="btn btn--primary">+ Create Event</a>
+        </div>
     </div>
 
     {% if events %}
-        <div class="grid grid--3">
+        <div class="grid grid--3" style="display: grid; gap: 2rem; margin-top: 1.5rem;">
             {% for event in events %}
-            <div class="card event-card animate-in">
+            <div class="card event-card animate-in {% if event.is_past() %}event-card--past{% endif %}">
                 <div>
                     <h3 class="card__title">{{ event.name }}</h3>
                     <div class="card__meta">
@@ -37,7 +57,9 @@
                 </div>
                 <div class="event-card__footer">
                     <a href="{{ url_for('event_detail', event_id=event.event_id) }}" class="btn btn--outline btn--sm">View Details</a>
-                    {% if event.is_full() %}
+                    {% if event.is_past() %}
+                        <span class="badge badge--closed">Closed</span>
+                    {% elif event.is_full() %}
                         <span class="badge badge--danger">Full</span>
                     {% else %}
                         <span class="badge badge--success">Open</span>
@@ -49,8 +71,16 @@
     {% else %}
         <div class="empty-state">
             <div class="empty-state__icon">📅</div>
-            <h3 class="empty-state__title">No events yet</h3>
-            <p class="empty-state__text">Create your first campus event to get started.</p>
+            {% if current_filter == 'upcoming' %}
+                <h3 class="empty-state__title">No upcoming events</h3>
+                <p class="empty-state__text">There are currently no upcoming events scheduled.</p>
+            {% elif current_filter == 'past' %}
+                <h3 class="empty-state__title">No past events</h3>
+                <p class="empty-state__text">There are no closed or past events to display.</p>
+            {% else %}
+                <h3 class="empty-state__title">No events yet</h3>
+                <p class="empty-state__text">Create your first campus event to get started.</p>
+            {% endif %}
             <a href="{{ url_for('create_event') }}" class="btn btn--primary">Create Event</a>
         </div>
     {% endif %}

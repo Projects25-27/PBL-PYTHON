@@ -85,6 +85,7 @@
                         <th>Event</th>
                         <th>Date</th>
                         <th>Venue</th>
+                        <th>Status</th>
                         <th>Capacity</th>
                         <th>Feedback</th>
                         <th>Avg Rating</th>
@@ -100,6 +101,15 @@
                         </td>
                         <td>{{ ev.date }}</td>
                         <td>{{ ev.venue }}</td>
+                        <td>
+                            {% if ev.is_past %}
+                            <span class="badge badge--closed">Closed</span>
+                            {% elif ev.is_full %}
+                            <span class="badge badge--danger">Full</span>
+                            {% else %}
+                            <span class="badge badge--success">Open</span>
+                            {% endif %}
+                        </td>
                         <td>
                             {{ ev.registered }} / {{ ev.max_participants }}
                             <div class="capacity-bar">

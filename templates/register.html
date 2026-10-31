@@ -15,12 +15,19 @@
                 <select id="event_id" name="event_id" class="form__select" required>
                     <option value="">— Choose an event —</option>
                     {% for event in events %}
-                        <option value="{{ event.event_id }}"
-                            {% if event.is_full() %}disabled{% endif %}>
-                            {{ event.name }}
-                            ({{ event.registered_count() }}/{{ event.max_participants }})
-                            {% if event.is_full() %} — FULL{% endif %}
-                        </option>
+                        {% if event.is_past() %}
+                            <option value="{{ event.event_id }}" disabled style="color: var(--clr-text-muted);">
+                                {{ event.name }} ({{ event.date }}) — CLOSED (Event ended)
+                            </option>
+                        {% elif event.is_full() %}
+                            <option value="{{ event.event_id }}" disabled>
+                                {{ event.name }} ({{ event.registered_count() }}/{{ event.max_participants }}) — FULL
+                            </option>
+                        {% else %}
+                            <option value="{{ event.event_id }}">
+                                {{ event.name }} ({{ event.registered_count() }}/{{ event.max_participants }})
+                            </option>
+                        {% endif %}
                     {% endfor %}
                 </select>
                 {% if not events %}
@@ -56,6 +63,7 @@
         <h3 style="color: var(--clr-text-heading); margin-bottom: var(--space-md);">ℹ️ Registration Rules</h3>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); color: var(--clr-text-muted);">
             <li>✅ Each student can register for an event only once</li>
+            <li>✅ Registration is closed for events whose date has passed</li>
             <li>✅ Registration is blocked when the event reaches maximum capacity</li>
             <li>✅ Both student and event must exist in the system</li>
             <li>✅ Registrations can be cancelled from the event detail page</li>
